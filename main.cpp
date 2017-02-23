@@ -9,7 +9,6 @@
 #include <string.h>
 #include <math.h>
 
-#include <sys/types.h>
 #include <dirent.h>
 
 
@@ -34,10 +33,7 @@
 #include <map> // multimap
 
 #include <sys/stat.h> // mkdir
-#include <sys/types.h> // mkdir
 
-
-//#include "camera.h"
 #include "algorithmparameters.h"
 #include "globalstate.h"
 #include "fusibile.h"
@@ -45,9 +41,7 @@
 #include "main.h"
 #include "fileIoUtils.h"
 #include "cameraGeometryUtils.h"
-#include "mathUtils.h"
 #include "displayUtils.h"
-#include "point_cloud_list.h"
 
 #define MAX_NR_POINTS 500000
 

@@ -110,6 +110,7 @@ static void readPFileStrechaPmvs(const string p_filename, Mat_<float> &P){
 }
 static void readKRtFileMiddlebury(const string filename, vector<Camera> cameras, InputFiles inputFiles)
 {
+    using namespace cv;
     ifstream myfile;
     myfile.open( filename, ifstream::in );
     string line;
