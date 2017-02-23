@@ -15,9 +15,6 @@
 // Includes CUDA
 #include <cuda_runtime.h>
 #include <cuda.h>
-#include <cuda_runtime_api.h>
-#include <cuda_texture_types.h>
-#include <vector_types.h>
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -79,28 +76,19 @@ static void get_subfolders(
   dir = opendir(dirname);
   if (dir != NULL)
   {
-    //cout << "Dirname is " << dirname << endl;
-    //cout << "Dirname type is " << ent->d_type << endl;
-    //cout << "Dirname type DT_DIR " << DT_DIR << endl;
-
     // Print all files and directories within the directory
     while ((ent = readdir(dir)) != NULL)
     {
-      //cout << "INSIDE" << endl;
-      //if(ent->d_type == DT_DIR)
       {
         char *name = ent->d_name;
         if (strcmp(name, ".") == 0 || strcmp(ent->d_name, "..") == 0)
         {
           continue;
         }
-        //printf ("dir %s/\n", name);
         subfolders.push_back(string(name));
       }
     }
-
     closedir(dir);
-
   }
   else
   {
@@ -724,8 +712,8 @@ static int runFusibile(int argc,
     {
       continue;
     }
-    unsigned posFirst = subfolders[i].find_first_of("_") + 1;
-    unsigned found = subfolders[i].substr(posFirst).find_first_of("_") + posFirst + 1;
+    unsigned long posFirst = subfolders[i].find_first_of("_") + 1;
+    unsigned long found = subfolders[i].substr(posFirst).find_first_of("_") + posFirst + 1;
     string id_string = subfolders[i].substr(found);
 
     consideredIds.insert(pair<int, string>(i, id_string));
@@ -750,11 +738,10 @@ static int runFusibile(int argc,
   cout << "img_filenames is " << inputFiles.img_filenames.size() << endl;
   algParameters->num_img_processed = min((int) numImages, algParameters->num_img_processed);
 
-  vector<Mat_<Vec3b> > img_color; // imgLeft_color, imgRight_color;
+  vector<Mat_<Vec3b> > img_color;
   vector<Mat_<uint8_t> > img_grayscale;
   for (size_t i = 0; i < numImages; i++)
   {
-    //printf ( "Opening image %ld: %s\n", i, ( inputFiles.images_folder + inputFiles.img_filenames[i] ).c_str () );
     img_grayscale.push_back(imread((inputFiles.images_folder + inputFiles.img_filenames[i]), IMREAD_GRAYSCALE));
     if (algParameters->color_processing)
     {
@@ -810,7 +797,6 @@ static int runFusibile(int argc,
     cout << camParams.viewSelectionSubset[i] << ", ";
     gs->cameras->viewSelectionSubset[i] = camParams.viewSelectionSubset[i];
   }
-  cout << endl;
 
   vector<InputData> inputData;
 
@@ -843,9 +829,7 @@ static int runFusibile(int argc,
     cout << "Reading disp " << i << endl;
     readDmb((dat.path + "/disp.dmb").c_str(), dat.depthMap);
 
-    //inputData.push_back(move(dat));
     inputData.push_back(dat);
-
   }
 
   // Init parameters
@@ -871,7 +855,6 @@ static int runFusibile(int argc,
   {
     gs->lines[i].resize(img_grayscale[0].rows * img_grayscale[0].cols);
     gs->lines[i].n = img_grayscale[0].rows * img_grayscale[0].cols;
-    //gs->lines.s = img_grayscale[0].step[0];
     gs->lines[i].s = img_grayscale[0].cols;
     gs->lines[i].l = img_grayscale[0].cols;
   }
@@ -883,14 +866,13 @@ static int runFusibile(int argc,
   vector<Mat_<uint16_t> > img_grayscale_uint(img_grayscale.size());
   for (size_t i = 0; i < img_grayscale.size(); i++)
   {
-    //img_grayscale[i].convertTo(img_grayscale_float[i], CV_32FC1, 1.0/255.0); // or CV_32F works (too)
-    img_grayscale[i].convertTo(img_grayscale_float[i], CV_32FC1); // or CV_32F works (too)
-    img_grayscale[i].convertTo(img_grayscale_uint[i], CV_16UC1); // or CV_32F works (too)
+    img_grayscale[i].convertTo(img_grayscale_float[i], CV_32FC1);
+    img_grayscale[i].convertTo(img_grayscale_uint[i], CV_16UC1);
     if (algParameters->color_processing)
     {
       vector<Mat_<float> > rgbChannels(3);
       img_color_float_alpha[i] = Mat::zeros(img_grayscale[0].rows, img_grayscale[0].cols, CV_32FC4);
-      img_color[i].convertTo(img_color_float[i], CV_32FC3); // or CV_32F works (too)
+      img_color[i].convertTo(img_color_float[i], CV_32FC3);
       Mat alpha(img_grayscale[0].rows, img_grayscale[0].cols, CV_32FC1);
       split(img_color_float[i], rgbChannels);
       rgbChannels.push_back(alpha);
@@ -904,8 +886,6 @@ static int runFusibile(int argc,
     merge(normal, normals_and_depth[i]);
 
   }
-  //int64_t t = getTickCount ();
-
   // Copy images to texture memory
   if (algParameters->saveTexture)
   {
@@ -925,17 +905,13 @@ static int runFusibile(int argc,
 #define get_pow2_norm(x, y) (pow2(x)+pow2(y))
 
   runcuda(*gs, pc_list, numSelViews);
-  //Mat_<Vec3f> norm0 = Mat::zeros ( img_grayscale[0].rows, img_grayscale[0].cols, CV_32FC3 );
   Mat_<float> distImg;
   char plyFile[256];
   sprintf(plyFile, "%s/final3d_model.ply", output_folder);
   printf("Writing ply file %s\n", plyFile);
-  //storePlyFileAsciiPointCloud ( plyFile, pc_list, inputData[0].cam, distImg);
-  storePlyFileBinaryPointCloud(plyFile, pc_list, distImg);
-  //char xyzFile[256];
-  //sprintf ( xyzFile, "%s/final3d_model.xyz", output_folder);
-  //printf("Writing ply file %s\n", xyzFile);
-  //storeXYZPointCloud ( xyzFile, pc_list, inputData[0].cam, distImg);
+
+  //storePlyFileBinaryPointCloud(plyFile, pc_list);
+  storePlyFileAsciiPointCloud(plyFile, pc_list);
 
   return 0;
 }
@@ -948,18 +924,6 @@ int main(int argc, char **argv)
     return 0;
   }
 
-  InputFiles inputFiles;
-  OutputFiles outputFiles;
-  GTcheckParameters gtParameters;
-  bool no_display = false;
-
-//  int ret = getParametersFromCommandLine(argc, argv, inputFiles, outputFiles, *algParameters, gtParameters, no_display);
-//  if (ret != 0)
-//  {
-//    return ret;
-//  }
-
-  Results results;
   runFusibile(argc, argv);
 
   return 0;
