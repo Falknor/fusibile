@@ -103,7 +103,7 @@ static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc)
         const Point_li &p = pc.points[i];
         const float4 normal = p.normal;
         float4 X = p.coord;
-        const char color = (int)((p.texture.x+p.texture.y+p.texture.z)/3.0f) ;
+        float3 color = {p.texture.x,p.texture.y,p.texture.z} ;
         /*const int color = 127.0f;*/
         /*printf("Writing point %f %f %f\n", X.x, X.y, X.z);*/
 
@@ -183,7 +183,7 @@ static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, 
         const Point_li &p = pc.points[i];
         const float4 normal = p.normal;
         float4 X = p.coord;
-        const int color = (int)((p.texture.x+p.texture.y+p.texture.z)/3.0f);
+      float3 color = {p.texture.x,p.texture.y,p.texture.z} ;
         /*const int color = 127.0f;*/
         /*printf("Writing point %f %f %f\n", X.x, X.y, X.z);*/
 

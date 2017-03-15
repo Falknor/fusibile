@@ -41,25 +41,21 @@ set(fusibile_lib_files
         helper_cuda.h
         helper_string.h
         managed.h
+        ModifiedFusibileAPI.cpp
         )
 
 # For compilation ...
 # Specify target & source files to compile it from
-cuda_add_executable(
-    fusibile
-    cameraGeometryUtils.h
-    vector_operations.h
-    camera.h
-    globalstate.h
-    algorithmparameters.h
-    cameraparameters.h
-    linestate.h
-    displayUtils.h
-    mathUtils.h
-    fileIoUtils.h
-    fusibile.cu
-    ModifiedFusibileAPI.cpp
-    )
+#cuda_add_executable(
+cuda_add_library(
+        fusibile
+        ${fusibile_lib_files}
+)
+
+add_executable(
+        fusibile_demo
+        main.cpp
+)
 
 # For linking ...
 # Specify target & libraries to link it with
