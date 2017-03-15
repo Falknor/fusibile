@@ -432,7 +432,6 @@ template<typename T>
     printf("Number of consistent points is \t%d\n", gs.params->numConsistentThresh);
     printf("Cam scale is \t%f\n", gs.params->cam_scale);
 
-    //int shared_memory_size = sizeof(float)  * SHARED_SIZE ;
     printf("Fusing points\n");
     cudaEventRecord(start);
 

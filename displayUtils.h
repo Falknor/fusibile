@@ -92,9 +92,9 @@ static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc)
     fprintf(outputPly, "property float nx\n");
     fprintf(outputPly, "property float ny\n");
     fprintf(outputPly, "property float nz\n");
-    fprintf(outputPly, "property uchar red\n");
-    fprintf(outputPly, "property uchar green\n");
-    fprintf(outputPly, "property uchar blue\n");
+    fprintf(outputPly, "property float red\n");
+    fprintf(outputPly, "property float green\n");
+    fprintf(outputPly, "property float blue\n");
     fprintf(outputPly, "end_header\n");
 
     //write data
@@ -114,16 +114,15 @@ static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc)
         }
 #pragma omp critical
         {
-            /*myfile << X.x << " " << X.y << " " << X.z << " " << normal.x << " " << normal.y << " " << normal.z << " " << color << " " << color << " " << color << endl;*/
             fwrite(&X.x,      sizeof(X.x), 1, outputPly);
             fwrite(&X.y,      sizeof(X.y), 1, outputPly);
             fwrite(&X.z,      sizeof(X.z), 1, outputPly);
             fwrite(&normal.x, sizeof(normal.x), 1, outputPly);
             fwrite(&normal.y, sizeof(normal.y), 1, outputPly);
             fwrite(&normal.z, sizeof(normal.z), 1, outputPly);
-            fwrite(&color,  sizeof(char), 1, outputPly);
-            fwrite(&color,  sizeof(char), 1, outputPly);
-            fwrite(&color,  sizeof(char), 1, outputPly);
+            fwrite(&color.x,  sizeof(color.x), 1, outputPly);
+            fwrite(&color.y,  sizeof(color.y), 1, outputPly);
+            fwrite(&color.z,  sizeof(color.z), 1, outputPly);
         }
 
     }
@@ -160,24 +159,6 @@ static void storeXYZPointCloud (char* plyFilePath, PointCloudList &pc) {
 static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, Mat_<float> &distImg) {
 	cout << "store 3D points to ply file" << endl;
 
-    /*FILE *outputPly;*/
-    /*outputPly=fopen(plyFilePath,"wb");*/
-
-    /*write header*/
-    /*fprintf(outputPly, "ply\n");*/
-    /*fprintf(outputPly, "format binary_little_endian 1.0\n");*/
-    /*fprintf(outputPly, "element vertex %d\n",count);*/
-    /*fprintf(outputPly, "property float x\n");*/
-    /*fprintf(outputPly, "property float y\n");*/
-    /*fprintf(outputPly, "property float z\n");*/
-    /*fprintf(outputPly, "property float nx\n");*/
-    /*fprintf(outputPly, "property float ny\n");*/
-    /*fprintf(outputPly, "property float nz\n");*/
-    /*fprintf(outputPly, "property uchar red\n");*/
-    /*fprintf(outputPly, "property uchar green\n");*/
-    /*fprintf(outputPly, "property uchar blue\n");*/
-    /*fprintf(outputPly, "end_header\n");*/
-
 	ofstream myfile;
 	myfile.open (plyFilePath, ios::out);
 
@@ -188,16 +169,13 @@ static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, 
 	myfile << "property float x" << endl;
 	myfile << "property float y" << endl;
 	myfile << "property float z" << endl;
-	myfile << "property float nx" << endl;
-	myfile << "property float ny" << endl;
-	myfile << "property float nz" << endl;
+//	myfile << "property float nx" << endl;
+//	myfile << "property float ny" << endl;
+//	myfile << "property float nz" << endl;
 	myfile << "property uchar red" << endl;
 	myfile << "property uchar green" << endl;
 	myfile << "property uchar blue" << endl;
 	myfile << "end_header" << endl;
-
-
-    distImg = Mat::zeros(pc.rows,pc.cols,CV_32F);
 
 	//write data
     #pragma omp parallel for
@@ -216,24 +194,16 @@ static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, 
         }
 #pragma omp critical
         {
-            myfile << X.x << " " << X.y << " " << X.z << " " << normal.x << " " << normal.y << " " << normal.z << " " << color << " " << color << " " << color << endl;
-            /*fwrite(&X.x,      sizeof(float), 1, outputPly);*/
-            /*fwrite(&X.y,      sizeof(float), 1, outputPly);*/
-            /*fwrite(&X.z,      sizeof(float), 1, outputPly);*/
-            /*fwrite(&normal.x, sizeof(float), 1, outputPly);*/
-            /*fwrite(&normal.y, sizeof(float), 1, outputPly);*/
-            /*fwrite(&normal.z, sizeof(float), 1, outputPly);*/
-            /*fwrite(&color,  sizeof(float), 1, outputPly);*/
-            /*fwrite(&color,  sizeof(float), 1, outputPly);*/
-            /*fwrite(&color,  sizeof(float), 1, outputPly);*/
+            myfile << X.x << " " << X.y << " " << X.z << " "
+//                   << normal.x << " " << normal.y << " " << normal.z << " "
+                   << (int)color.x << " " << (int)color.y << " " << (int)color.z << endl;
         }
-
     }
 	myfile.close();
-/*fclose(outputPly);*/
 }
+
 //template <typename ImgType>
-static void storePlyFileBinaryPointCloud(char* plyFilePath, PointCloud &pc, Mat_<float> &distImg) {
+static void storePlyFileBinaryPointCloud(char* plyFilePath, PointCloud &pc) {
     cout << "store 3D points to ply file" << endl;
 
     FILE *outputPly;
@@ -253,9 +223,6 @@ static void storePlyFileBinaryPointCloud(char* plyFilePath, PointCloud &pc, Mat_
     /*fprintf(outputPly, "property uchar green\n");*/
     /*fprintf(outputPly, "property uchar blue\n");*/
     fprintf(outputPly, "end_header\n");
-
-
-    distImg = Mat::zeros(pc.rows,pc.cols,CV_32F);
 
     //write data
 /*#pragma omp parallel for*/
