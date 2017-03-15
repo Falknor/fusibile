@@ -43,7 +43,7 @@ cuda_add_executable(
     mathUtils.h
     fileIoUtils.h
     fusibile.cu
-    main.cpp
+    ModifiedFusibileAPI.cpp
     )
 
 # For linking ...

@@ -36,8 +36,6 @@
 #include <sys/stat.h> // mkdir
 #include <sys/types.h> // mkdir
 
-
-//#include "camera.h"
 #include "algorithmparameters.h"
 #include "globalstate.h"
 #include "fusibile.h"
@@ -173,11 +171,6 @@ static int getParametersFromCommandLine ( int argc,
         if ( argv[i][0] != '-' )
         {
             inputFiles.img_filenames.push_back ( argv[i] );
-            /*if( inputFiles.imgLeft_filename.empty() )
-              inputFiles.imgLeft_filename = argv[i];
-              else if( inputFiles.imgRight_filename.empty() )
-              inputFiles.imgRight_filename = argv[i];
-              */
         }
         else if ( strncmp ( argv[i], algorithm_opt, strlen ( algorithm_opt ) ) == 0 )
         {
@@ -352,11 +345,8 @@ static int getParametersFromCommandLine ( int argc,
         else
         {
             printf ( "Command-line parameter error: unknown option %s\n", argv[i] );
-            //return -1;
         }
     }
-    //cout << "KRt file is " << inputFiles.krt_file << endl;
-
     return 0;
 }
 
@@ -378,8 +368,6 @@ static void selectViews ( CameraParameters &cameraParams, int imgWidth, int imgH
     float maximum_angle_radians = maximum_angle_degree * M_PI / 180.0f;
     printf("Accepted intersection angle of central rays is %f to %f degrees\n", minimum_angle_degree, maximum_angle_degree);
     for ( size_t i = 0; i < cameras.size (); i++ ) {
-        //if ( i == cameraParams.idRef && !cameraParams.rectified )
-        //  continue;
 
         if ( !viewSel ) { //select all views, dont perform selection
             cameraParams.viewSelectionSubset.push_back ( i );
@@ -847,7 +835,7 @@ static int runFusibile (int argc,
     sprintf ( plyFile, "%s/final3d_model.ply", output_folder);
     printf("Writing ply file %s\n", plyFile);
     //storePlyFileAsciiPointCloud ( plyFile, pc_list, inputData[0].cam, distImg);
-    storePlyFileBinaryPointCloud ( plyFile, pc_list, distImg);
+    storePlyFileBinaryPointCloud ( plyFile, pc_list);
     //char xyzFile[256];
     //sprintf ( xyzFile, "%s/final3d_model.xyz", output_folder);
     //printf("Writing ply file %s\n", xyzFile);

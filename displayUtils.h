@@ -76,7 +76,7 @@ static string getColorString(Vec3i color){
 	ss << (int)((float)color(2)/256.f) << " " << (int)((float)color(1)/256.f) << " " << (int)((float)color(0)/256.f);
 	return ss.str();
 }
-static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc, Mat_<float> &distImg) {
+static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc) {
     cout << "store 3D points to ply file" << endl;
 
     FILE *outputPly;
@@ -97,15 +97,13 @@ static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc,
     fprintf(outputPly, "property uchar blue\n");
     fprintf(outputPly, "end_header\n");
 
-    distImg = Mat::zeros(pc.rows,pc.cols,CV_32F);
-
     //write data
 #pragma omp parallel for
     for(size_t i = 0; i < pc.size; i++) {
         const Point_li &p = pc.points[i];
         const float4 normal = p.normal;
         float4 X = p.coord;
-        const char color = (int)p.texture;
+        const char color = (int)((p.texture.x+p.texture.y+p.texture.z)/3.0f) ;
         /*const int color = 127.0f;*/
         /*printf("Writing point %f %f %f\n", X.x, X.y, X.z);*/
 
@@ -131,6 +129,7 @@ static void storePlyFileBinaryPointCloud (char* plyFilePath, PointCloudList &pc,
     }
     fclose(outputPly);
 }
+
 static void storeXYZPointCloud (char* plyFilePath, PointCloudList &pc) {
     cout << "store 3D points to ply file" << endl;
 
@@ -157,6 +156,7 @@ static void storeXYZPointCloud (char* plyFilePath, PointCloudList &pc) {
     }
 	myfile.close();
 }
+
 static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, Mat_<float> &distImg) {
 	cout << "store 3D points to ply file" << endl;
 
@@ -205,7 +205,7 @@ static void storePlyFileAsciiPointCloud (char* plyFilePath, PointCloudList &pc, 
         const Point_li &p = pc.points[i];
         const float4 normal = p.normal;
         float4 X = p.coord;
-        const int color = (int)p.texture;
+        const int color = (int)((p.texture.x+p.texture.y+p.texture.z)/3.0f);
         /*const int color = 127.0f;*/
         /*printf("Writing point %f %f %f\n", X.x, X.y, X.z);*/
 
